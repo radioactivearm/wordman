@@ -53,6 +53,27 @@ the_word = runner()
 
 # ======================================================
 
+# draws ascii stick figure
+
+def doodle(limbs):
+    if limbs > 0:
+        print(f"('>')")
+    if limbs == 3:
+        print(f"--|")
+    if limbs > 3:
+        print(f"--|--")
+    if limbs == 2:
+        print(f"  |  ")
+        print(f"  |  ")
+    if limbs > 2:
+        print(f"  |  ")
+    if limbs == 5:
+        print(f" /  ")
+    if limbs > 5:
+        print(f" /\ ")
+
+# ======================================================
+
 # function that takes a guess of a letter
 def selector(word):
     l = len(word)
@@ -80,9 +101,11 @@ def selector(word):
             print(' '.join(shadow))
             # print('')
         else:
+
             print(' '.join(shadow))
             # print('')
             x = x + 1
+            doodle(x)
             if x == 6:
                 print('Wordman')
         print(f'Limbs is at {x}/{limbs} and Letter count is {count}/{l}')
@@ -91,6 +114,7 @@ def selector(word):
 
     if input('Play again? (y/n): ') == 'y':
         selector(runner())
+
 
 selector(the_word)
 
