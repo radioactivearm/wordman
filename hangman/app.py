@@ -2,12 +2,21 @@ print('running ../hangman/app.py')
 
 import pandas as pd
 import numpy as np
+import string
 
 # reading csv into pandas df
 words = pd.read_csv('../data/WikiWords.csv')
 
+# smallest word
+miniword = 3
+# biggest word
+maxiword = 21
+
 # dropping all words under 3 letters
-wordz = words.loc[words.name.str.len() > 2, :]
+wordz = words.loc[words.name.str.len() >= miniword, :]
+# wordz = wordz.loc[wordz.name.str.len() <= maxiword, :]
+# # incase you want all the letters
+# wordz = words.copy()
 
 wordz = wordz.rename(columns={"name": "word"})
 
@@ -18,10 +27,10 @@ wordz = wordz.rename(columns={"name": "word"})
 levels = {}
 
 # end length
-end = wordz.word.str.len().max() + 1
+end = wordz.word.str.len().max() + 1 # grabbing this for down below
 
 # start point
-start = wordz.word.str.len().min() 
+start = wordz.word.str.len().min() # grabbing this for down below
 
 # loop over df and pull out smaller dfs
 for i in range(start, end):
@@ -42,7 +51,13 @@ def wordman(number):
 
 # fucntion that takes input and runs wordman
 def runner():
-    length = input('Enter a word length: ')
+    length = 'Andy'
+    while type(length) != int:
+        length = input(f'Enter a word length ({start}/{end-1}): ')
+        try:
+            length = int(length)
+        except:
+            print('That is not a number')
     word = wordman(int(length))
     return word
 
@@ -53,9 +68,17 @@ the_word = runner()
 
 # ======================================================
 
+alphabet = list(string.ascii_lowercase)
+
+# print(alphabet)
+
+# ======================================================
+
 # draws ascii stick figure
 
 def doodle(limbs):
+    if limbs > 6:
+        print(f"_|W|_")
     if limbs > 0:
         print(f"('>')")
     if limbs == 3:
@@ -80,39 +103,54 @@ def selector(word):
     l = len(word)
     # set count of empty spots
     count = l
-    # initial print
-    print('_ ' * l)
+
     # https://stackoverflow.com/questions/10712002/create-an-empty-list-in-python-with-certain-size
     # set shadow list
     shadow = ['_'] * l
+    # initial print
+    print(' '.join(shadow))
     # a list that will fill with guessed letters
     guessed = []
     # will increase each time guessed wrong
     x = 0
     # number of limbs on wordman
     limbs = 6
+    
+
+    # easter egg hat happens randomly on 42
+    randman = np.ceil(42*np.random.uniform(0,1,1))
+
+    if randman == 42:
+        limbs = 7
 
     # loop until it runs out of limbs
     while x < limbs and count > 0:
+        # sorts the guess bin for ease of reading
+        guessed.sort()
         # prints already guessed letters
         print(', '.join(guessed))
         # input a letter
-        letter = input('Enter a letter: ')
+        letter = '@'
+        while letter.lower() not in alphabet or letter.lower() in guessed:
+            letter = input('Enter a letter: ')
+
+        print(' ')
+
         # append it to guessed
-        guessed.append(letter)
+        guessed.append(letter.lower())
 
         
 
         # if letter is in word
-        if letter in word:
+        if letter.lower() in word:
             # get location of letter in word in form of list
             # https://stackoverflow.com/questions/2294493/how-to-get-the-position-of-a-character-in-python
-            location = [pos for pos, char in enumerate(word) if char == letter]
+            location = [pos for pos, char in enumerate(word) if char == letter.lower()]
             lol = len(location)
             # for each location in list
             for i in location:
                 # add letter to corisponding spot in shadow list
-                shadow[i] = letter
+                shadow[i] = letter.lower()
                 # drop down count of remaining letters
                 count = count - 1
             
@@ -133,11 +171,12 @@ def selector(word):
             # draw wordman
             doodle(x)
             # if game is over
-            if x == 6:
+            if x == limbs:
                 print('Wordman')
                 print(f"Word was {word}")
         # tells you status
-        print(f'Limbs is at {x}/{limbs} and Letter count is {l-count}/{l}')
+        print(f'{x}/{limbs}:{l-count}/{l}')
+
 
     # https://stackoverflow.com/questions/12495218/using-user-input-to-call-functions
 
